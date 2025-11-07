@@ -8,4 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 class Report extends Model
 {
     use HasFactory;
+    protected $fillable = ['project_id','report_type',  'data'];
+    public function user(){ return $this->belongsTo(User::class); }
+    public function keywords(){ return $this->hasMany(Keyword::class); }
+    public function reports(){ return $this->hasMany(Report::class); }
 }

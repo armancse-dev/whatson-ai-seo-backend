@@ -2,7 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-
+use App\Http\Controllers\Api\AuthController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -16,4 +16,17 @@ use Illuminate\Support\Facades\Route;
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
+});
+
+Route::get('/sanctum/csrf-cookie', [AuthController::class,'csrf']);
+Route::post('/register', [AuthController::class,'register']);
+Route::post('/login', [AuthController::class,'login']);
+
+Route::middleware('auth:sanctum')->group(function(){
+    Route::post('/logout',[AuthController::class,'logout']);
+    // Projects
+    Route::apiResource('projects', \App\Http\Controllers\Api\ProjectController::class);
+    // Run audit
+    Route::post('projects/{project}/run-audit', [\App\Http\Controllers\Api\AuditController::class,'run']);
+    // Keywords clustering / reports etc
 });
