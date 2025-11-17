@@ -13,7 +13,8 @@ class AuthController extends Controller
         $r->validate(['name'=>'required','email'=>'required|email|unique:users','password'=>'required|min:6']);
         $user = User::create(['name'=>$r->name,'email'=>$r->email,'password'=>Hash::make($r->password)]);
         auth()->login($user);
-        return response()->json($user,201);
+        $token = $user->createToken('api')->plainTextToken;
+        return response()->json(['user' => $user, 'token' => $token], 201);
     }
 
     public function login(Request $r) {
@@ -23,19 +24,20 @@ class AuthController extends Controller
             throw ValidationException::withMessages(['email'=>['The provided credentials are incorrect.']]);
         }
         auth()->login($user);
-        return response()->json($user);
+        $token = $user->createToken('api')->plainTextToken;
+        return response()->json(['user' => $user, 'token' => $token]);
     }
 
     public function logout(Request $r){
-        auth()->logout();
+        if ($r->user() && $r->user()->currentAccessToken()) {
+            $r->user()->currentAccessToken()->delete();
+        }
         return response()->json(['message'=>'logged out']);
     }
 
     // csrf cookie endpoint:
     public function csrf() {
-        return response()->noContent();
+        // For cookie-based SPA auth: set XSRF-TOKEN cookie
+        return response()->noContent()->cookie('XSRF-TOKEN', csrf_token(), 120, '/', null, false, false);
     }
-
-
-    
 }

@@ -1,12 +1,11 @@
 <?php
-use GuzzleHttp\Client;
+namespace App\Services;
+
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 
 class OpenAiService
 {
-   protected $http;
-   protected $apiKey;
-   protected $endpoint;
-
    protected string $key;
    protected string $url;
    protected string $model;
@@ -44,9 +43,6 @@ class OpenAiService
             $resp = Http::withHeaders([
                 'Authorization' => "Bearer {$this->key}",
                 'Content-Type' => 'application/json',
-                // optionally pass referer/title for OpenRouter ranking/analytics
-                // 'HTTP-Referer' => 'https://your-app.example',
-                // 'X-Title' => 'Whatson AI SEO Tools',
             ])->timeout(30)->post($this->url, $payload);
 
             if ($resp->successful()) {
@@ -79,7 +75,7 @@ class OpenAiService
 
             Log::error('OpenAiService error', ['status' => $resp->status(), 'body' => $resp->body()]);
             throw new \Exception("OpenRouter request failed: HTTP {$resp->status()} - {$resp->body()}");
-        } catch (Throwable $e) {
+        } catch (\Throwable $e) {
             if ($attempt <= $this->maxRetries + 1) {
                 sleep(1 * $attempt);
                 goto start;
