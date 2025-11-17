@@ -12,4 +12,5 @@ class Report extends Model
     public function user(){ return $this->belongsTo(User::class); }
     public function keywords(){ return $this->hasMany(Keyword::class); }
     public function reports(){ return $this->hasMany(Report::class); }
+    protected $casts = ['data' => 'array'];
 }

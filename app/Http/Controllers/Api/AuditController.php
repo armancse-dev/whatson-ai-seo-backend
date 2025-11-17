@@ -9,9 +9,8 @@ class AuditController extends Controller
 {
     public function run(Project $project)
     {
-        $this->authorize('update', $project);
-        // dispatch job
+        $this->authorize('view', $project);
         RunOnPageAudit::dispatch($project);
-        return response()->json(['message' => 'audit-queued']);
+        return response()->json(['message' => 'audit_queued'], 202);
     }
 }
